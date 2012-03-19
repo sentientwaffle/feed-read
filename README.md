@@ -1,4 +1,7 @@
 # Feed-Read
+
+[![Build Status](https://secure.travis-ci.org/sentientwaffle/feed-read.png?branch=master)](http://travis-ci.org/sentientwaffle/feed-read)
+
 [Node.js](http://nodejs.org/) module for parsing RSS and ATOM feeds into
 a common article object.
 
