@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>DJG</title>
+  <link href="http://sentientwaffle.github.com/atom.xml" rel="self"/>
+  <link href="http://sentientwaffle.github.com/"/>
+  <updated>2012-03-01T12:01:58-08:00</updated>
+  <id>http://sentientwaffle.github.com/</id>
+  <author>
+    <name>DJG</name>
+  </author>
+  
+  
+    <entry>
+      <title>Save file on blur</title>
+      <link href="http://sentientwaffle.github.com/save-file-on-blur"/>
+      <updated>2012-02-09T00:00:00-08:00</updated>
+      <id>http://sentientwaffle.github.com/save-file-on-blur</id>
+      <content type="html">&lt;h2&gt;Intro&lt;/h2&gt;
+
+&lt;p&gt;When doing web development, I frequently need to switch back and
+forth between the editor and a browser to see the updates.
+This simple plugin will save the file whenever it loses focus.&lt;/p&gt;
+
+&lt;h2&gt;&lt;a href=&quot;https://github.com/sentientwaffle/save-on-blur&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;stratus = require 'stratus'
+stratus.on &quot;fractus.blur&quot;, (editor) -&amp;gt;
+  editor.save()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;3 whole lines.&lt;/em&gt; Not bad.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;fractus.blur&lt;/code&gt; event is called whenever an editor loses focus, and
+the callback receives that editor.&lt;/p&gt;
+
+&lt;h3&gt;By Bundle&lt;/h3&gt;
+
+&lt;p&gt;If you want to apply the bundle to only CSS, Sass, and Stylus files:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;stratus.on &quot;fractus.blur&quot;, (editor) -&amp;gt;
+  syntax = editor.syntax?.name
+  return unless syntax &amp;amp;&amp;amp; /^(CSS|Sass|Stylus)\b/.test(syntax)
+  editor.save()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Installing the plugin&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ stratus plugin:install &amp;lt;username&amp;gt; path/to/your/plugin.coffee
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;More info&lt;/h2&gt;
+
+&lt;p&gt;For more information on writing plugins for Stratus,
+see the &lt;a href=&quot;http://stratuseditor.com/plugins&quot;&gt;plugin API&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;A configurable version of the save-on-blur plugin is available
+on &lt;a href=&quot;https://github.com/sentientwaffle/save-on-blur&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are &lt;a href=&quot;http://stratuseditor.com/plugins#Events&quot;&gt;plenty of other useful events&lt;/a&gt; you can use.&lt;/p&gt;
+</content>
+    </entry>
+  
+</feed>
