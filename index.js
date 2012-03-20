@@ -67,8 +67,7 @@ FeedRead.get = function(feed_url, callback) {
     } else if (type == "rss") {
       FeedRead.rss(body, feed_url, callback);
     } else {
-      return callback(new Error( "Body is not RSS or ATOM"
-                                , body.substr(0, 30), "..."));
+      return callback(new Error("Body is not RSS or ATOM", "<"+ feed_url +">", res.statusCode));
     }
   });
 };
@@ -121,7 +120,7 @@ FeedRead.atom = function(xml, source, callback) {
         
         var obj = {
             title:     child_data(art, "title")
-          , content:   child_data(art, "content")
+          , content:   scrub_html(child_data(art, "content"))
           , published: child_data(art, "published")
                     || child_data(art, "updated")
           , author:    author || default_author
