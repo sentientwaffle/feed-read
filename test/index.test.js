@@ -24,10 +24,11 @@ function load_fixture(name) {
 }
 
 var fixtures =
-    { atom:        load_fixture("atom.xml")
-    , rss:         load_fixture("rss.xml")
-    , google_news: load_fixture("google-news.rss")
-    , techcrunch:  load_fixture("techcrunch.rss")
+    { atom:         load_fixture("atom.xml")
+    , atom_invalid: load_fixture("atom-invalid.xml")
+    , rss:          load_fixture("rss.xml")
+    , google_news:  load_fixture("google-news.rss")
+    , techcrunch:   load_fixture("techcrunch.rss")
     };
 
 
@@ -84,42 +85,54 @@ describe("feed", function() {
   
   
   describe(".atom", function() {
-    var articles;
-    before(function(done) {
-      feed.atom(fixtures.atom, function(err, arts) {
-        articles = arts;
-        done(err);
+    describe("valid XML", function() {
+      var articles;
+      before(function(done) {
+        feed.atom(fixtures.atom, function(err, arts) {
+          articles = arts;
+          done(err);
+        });
+      });
+      
+      it("is an Array of articles", function() {
+        articles.should.be.an.instanceof(Array);
+        articles[0].should.be.an.instanceof(Object);
+      });
+      
+      it("has a title", function() {
+        articles[0].title.should.eql("Save file on blur");
+      });
+      
+      it("has an author", function() {
+        articles[0].author.should.eql("DJG");
+      });
+      
+      it("has a link", function() {
+        articles[0].link.should.eql("http://sentientwaffle.github.com/save-file-on-blur");
+      });
+      
+      it("has content", function() {
+        articles[0].content.should.include("Installing the plugin");
+      });
+      
+      it("has a published date", function() {
+        articles[0].published.should.be.an.instanceof(Date);
+      });
+      
+      it("has a feed", function() {
+        articles[0].feed.name.should.eql("DJG");
+        articles[0].feed.link.should.eql("http://sentientwaffle.github.com/");
       });
     });
     
-    it("is an Array of articles", function() {
-      articles.should.be.an.instanceof(Array);
-      articles[0].should.be.an.instanceof(Object);
-    });
-    
-    it("has a title", function() {
-      articles[0].title.should.eql("Save file on blur");
-    });
-    
-    it("has an author", function() {
-      articles[0].author.should.eql("DJG");
-    });
-    
-    it("has a link", function() {
-      articles[0].link.should.eql("http://sentientwaffle.github.com/save-file-on-blur");
-    });
-    
-    it("has content", function() {
-      articles[0].content.should.include("Installing the plugin");
-    });
-    
-    it("has a published date", function() {
-      articles[0].published.should.be.an.instanceof(Date);
-    });
-    
-    it("has a feed", function() {
-      articles[0].feed.name.should.eql("DJG");
-      articles[0].feed.link.should.eql("http://sentientwaffle.github.com/");
+    describe("invalid XML", function() {
+      it("doesn't crash on invalid XML", function(done) {
+        feed.atom(fixtures.atom_invalid, function(err, arts) {
+          should.not.exist(err);
+          arts.should.be.an.instanceof(Array);
+          done();
+        });
+      });
     });
   });
   

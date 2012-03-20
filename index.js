@@ -113,8 +113,9 @@ FeedRead.atom = function(xml, source, callback) {
   };
   
   parser.onend = function() {
-    callback(null, _.map(articles,
+    callback(null, _.filter(_.map(articles,
       function(art) {
+        if (!art.children.length) return false;
         var author = child_by_name(art, "author");
         if (author) author = child_data(author, "name");
         
@@ -130,7 +131,7 @@ FeedRead.atom = function(xml, source, callback) {
         if (obj.published) obj.published = new Date(obj.published);
         return obj;
       }
-    ));
+    ), function(art) { return !!art; }));
   };
   
   parser.write(xml);
@@ -170,8 +171,9 @@ FeedRead.rss = function(xml, source, callback) {
   };
   
   parser.onend = function() {
-    callback(null, _.map(articles,
+    callback(null, _.filter(_.map(articles,
       function(art) {
+        if (!art.children.length) return false;
         var obj = {
             title:     child_data(art, "title")
           , content:   scrub_html(child_data(art, "content:encoded"))
@@ -185,7 +187,7 @@ FeedRead.rss = function(xml, source, callback) {
         if (obj.published) obj.published = new Date(obj.published);
         return obj;
       }
-    ));
+    ), function(art) { return !!art; }));
   };
   
   parser.write(xml);
@@ -215,11 +217,10 @@ var FeedParser = (function() {
     parser.onopentag  = function(tag) { _this.open(tag); };
     parser.onclosetag = function(tag) { _this.close(tag); };
     
+    parser.onerror = function() { this.error = undefined; }
     parser.ontext  = function(text) { _this.ontext(text); };
     parser.oncdata = function(text) { _this.ontext(text); };
     parser.onend   = function() { _this.onend(); };
-    
-    parser.onerror = console.error;
   }
   
   
