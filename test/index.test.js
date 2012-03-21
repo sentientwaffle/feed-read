@@ -81,7 +81,7 @@ describe("feed", function() {
       done();
     });
   });
-    
+  
   it("can fetch multiple urls", function(done) {
     feed([host + "/atom.xml", host + "/rss.xml"], function(err, articles) {
       if (err) return done(err);
