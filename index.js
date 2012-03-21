@@ -42,9 +42,9 @@ var FeedRead = module.exports = function(feed_url, callback) {
 // 
 // Returns "atom", "rss", or false when it is neither.
 FeedRead.identify = function(xml) {
-  if (/<rss /i.test(xml)) {
+  if (/<rss\b/i.test(xml)) {
     return "rss";
-  } else if (/<feed /i.test(xml)) {
+  } else if (/<feed\b/i.test(xml)) {
     return "atom";
   } else {
     return false;
@@ -59,7 +59,7 @@ FeedRead.identify = function(xml) {
 // callback - Receives `(err, articles)`.
 // 
 FeedRead.get = function(feed_url, callback) {
-  request(feed_url, function(err, res, body) {
+  request(feed_url, {timeout: 3000}, function(err, res, body) {
     if (err) return callback(err);
     var type = FeedRead.identify(body);
     if (type == "atom") {

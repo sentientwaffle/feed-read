@@ -24,38 +24,64 @@ function load_fixture(name) {
 }
 
 var fixtures =
-    { atom:         load_fixture("atom.xml")
-    , atom_invalid: load_fixture("atom-invalid.xml")
-    , rss:          load_fixture("rss.xml")
-    , google_news:  load_fixture("google-news.rss")
-    , techcrunch:   load_fixture("techcrunch.rss")
-    };
+  { atom:         load_fixture("atom.xml")
+  , atom_invalid: load_fixture("atom-invalid.xml")
+  , rss:          load_fixture("rss.xml")
+  , google_news:  load_fixture("google-news.rss")
+  , techcrunch:   load_fixture("techcrunch.rss")
+  };
 
 
 describe("feed", function() {
   describe("fetching a single feed", function() {
-    var articles;
-    before(function(done) {
-      feed(host + "/atom.xml", function(err, _articles) {
-        articles = _articles;
-        done(err);
+    describe("local", function() {
+      var articles;
+      before(function(done) {
+        feed(host + "/atom.xml", function(err, _articles) {
+          articles = _articles;
+          done(err);
+        });
+      });
+      
+      it("is an Array", function() {
+        articles.should.be.an.instanceof(Array);
+      });
+      
+      it("contains articles", function() {
+        articles[0].title.should.eql("Save file on blur");
+      });
+      
+      it("attaches the feed to each article", function() {
+        articles[0].feed.source.should.eql(host + "/atom.xml");
+        articles[0].feed.name.should.eql("DJG");
       });
     });
     
-    it("is an Array", function() {
+    describe("with redirects", function() {
+      var articles;
+      before(function(done) {
+        feed("http://googleplusplatform.blogspot.com/feeds/posts/default"
+        , function(err, _articles) {
+          articles = _articles;
+          done(err);
+        });
+      });
+      
+      it("is an Array of articles", function() {
         articles.should.be.an.instanceof(Array);
-    });
-    
-    it("contains articles", function() {
-      articles[0].title.should.eql("Save file on blur");
-    });
-    
-    it("attaches the feed to each article", function() {
-      articles[0].feed.source.should.eql(host + "/atom.xml");
-      articles[0].feed.name.should.eql("DJG");
+        articles[0].title.should.be.a("string");
+      });
     });
   });
-  
+
+  it("parses funny atom correctly", function(done) {
+    feed("http://davidwalsh.name/feed/atom", function(err, articles) {
+      should.not.exist(err);
+      articles.should.be.an.instanceof(Array);
+      done();
+    });
+  });
+    
   it("can fetch multiple urls", function(done) {
     feed([host + "/atom.xml", host + "/rss.xml"], function(err, articles) {
       if (err) return done(err);
