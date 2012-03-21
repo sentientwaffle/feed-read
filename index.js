@@ -42,7 +42,7 @@ var FeedRead = module.exports = function(feed_url, callback) {
 // 
 // Returns "atom", "rss", or false when it is neither.
 FeedRead.identify = function(xml) {
-  if (/<rss\b/i.test(xml)) {
+  if (/<(rss|rdf)\b/i.test(xml)) {
     return "rss";
   } else if (/<feed\b/i.test(xml)) {
     return "atom";

@@ -74,8 +74,8 @@ describe("feed", function() {
     });
   });
 
-  it("parses funny atom correctly", function(done) {
-    feed("http://davidwalsh.name/feed/atom", function(err, articles) {
+  it("handles RDF as RSS", function(done) {
+    feed("http://rss.slashdot.org/Slashdot/slashdot", function(err, articles) {
       should.not.exist(err);
       articles.should.be.an.instanceof(Array);
       done();
