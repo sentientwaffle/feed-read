@@ -111,26 +111,31 @@ FeedRead.atom = function(xml, source, callback) {
     }
   };
   
-  parser.onend = function() {
-    callback(null, _.filter(_.map(articles,
-      function(art) {
-        if (!art.children.length) return false;
-        var author = child_by_name(art, "author");
-        if (author) author = child_data(author, "name");
-        
-        var obj = {
-            title:     child_data(art, "title")
-          , content:   scrub_html(child_data(art, "content"))
-          , published: child_data(art, "published")
-                    || child_data(art, "updated")
-          , author:    author || default_author
-          , link:      child_by_name(art, "link").attributes.href
-          , feed:      meta
-          };
-        if (obj.published) obj.published = new Date(obj.published);
-        return obj;
-      }
-    ), function(art) { return !!art; }));
+   parser.onend = function(errors) {
+    if (errors.length > 0) {
+      callback(errors);
+    }
+    else {
+      callback(null, _.filter(_.map(articles,
+        function(art) {
+          if (!art.children.length) return false;
+          var author = child_by_name(art, "author");
+          if (author) author = child_data(author, "name");
+          
+          var obj = {
+              title:     child_data(art, "title")
+            , content:   scrub_html(child_data(art, "content"))
+            , published: child_data(art, "published")
+                      || child_data(art, "updated")
+            , author:    author || default_author
+            , link:      child_by_name(art, "link").attributes.href
+            , feed:      meta
+            };
+          if (obj.published) obj.published = new Date(obj.published);
+          return obj;
+        }
+      ), function(art) { return !!art; }));
+    }
   };
   
   parser.write(xml);
@@ -169,24 +174,29 @@ FeedRead.rss = function(xml, source, callback) {
     }
   };
   
-  parser.onend = function() {
-    callback(null, _.filter(_.map(articles,
-      function(art) {
-        if (!art.children.length) return false;
-        var obj = {
-            title:     child_data(art, "title")
-          , content:   scrub_html(child_data(art, "content:encoded"))
-                    || scrub_html(child_data(art, "description"))
-          , published: child_data(art, "pubDate")
-          , author:    child_data(art, "author")
-                    || child_data(art, "dc:creator")
-          , link:      child_data(art, "link")
-          , feed:      meta
-          };
-        if (obj.published) obj.published = new Date(obj.published);
-        return obj;
-      }
-    ), function(art) { return !!art; }));
+  parser.onend = function(errors) {
+    if (errors.length > 0) {
+      callback(errors);
+    }
+    else {
+      callback(null, _.filter(_.map(articles,
+        function(art) {
+          if (!art.children.length) return false;
+          var obj = {
+              title:     child_data(art, "title")
+            , content:   scrub_html(child_data(art, "content:encoded"))
+                      || scrub_html(child_data(art, "description"))
+            , published: child_data(art, "pubDate")
+            , author:    child_data(art, "author")
+                      || child_data(art, "dc:creator")
+            , link:      child_data(art, "link")
+            , feed:      meta
+            };
+          if (obj.published) obj.published = new Date(obj.published);
+          return obj;
+        }
+      ), function(art) { return !!art; }));
+    }
   };
   
   parser.write(xml);
@@ -206,6 +216,7 @@ var FeedParser = (function() {
   // callback - Receives `(err, obj)`.
   // 
   function FeedParser() {
+    var errors = [];
     this.current_tag = null;
     var parser       = this.parser = sax.parser(true,
         { trim: true
@@ -213,19 +224,25 @@ var FeedParser = (function() {
         })
       , _this        = this;
     
+
     parser.onopentag  = function(tag) { _this.open(tag); };
     parser.onclosetag = function(tag) { _this.close(tag); };
     
-    parser.onerror = function() { this.error = undefined; }
+    parser.onerror = function(err) {  _this.onerror(err); }
     parser.ontext  = function(text) { _this.ontext(text); };
     parser.oncdata = function(text) { _this.ontext(text); };
-    parser.onend   = function() { _this.onend(); };
+    parser.onend   = function() { _this.onend(errors); };
   }
   
   
   // Public: Parse the XML.
   FeedParser.prototype.write = function(xml) {
-    this.parser.write(xml).close();
+     this.errors = [];
+    this.parser.write(xml);
+    if (!this.parser.error)
+       this.parser.close();
+     else
+       this.onend(this.errors);
   };
   
   // Internal: Open a tag.
@@ -252,6 +269,11 @@ var FeedParser = (function() {
     if (this.current_tag) {
       this.current_tag.children.push(text);
     }
+  };
+
+// Internal: Log any errors
+  FeedParser.prototype.onerror = function(error) {
+      this.errors.push(error);
   };
   
   return FeedParser;

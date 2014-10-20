@@ -154,8 +154,9 @@ describe("feed", function() {
     describe("invalid XML", function() {
       it("doesn't crash on invalid XML", function(done) {
         feed.atom(fixtures.atom_invalid, function(err, arts) {
-          should.not.exist(err);
-          arts.should.be.an.instanceof(Array);
+          err.should.be.an.instanceof(Array);
+          err.length.should.eql(13);
+          should.not.exist(arts);
           done();
         });
       });
