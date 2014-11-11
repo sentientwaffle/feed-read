@@ -181,6 +181,7 @@ FeedRead.rss = function(xml, source, callback) {
           , author:    child_data(art, "author")
                     || child_data(art, "dc:creator")
           , link:      child_data(art, "link")
+          , category:  child_data(art, "category")
           , feed:      meta
           };
         if (obj.published) obj.published = new Date(obj.published);
