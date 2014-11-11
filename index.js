@@ -181,6 +181,7 @@ FeedRead.rss = function(xml, source, callback) {
           , author:    child_data(art, "author")
                     || child_data(art, "dc:creator")
           , link:      child_data(art, "link")
+          , category:  child_data(art, "category")
           , feed:      meta
           };
         if (obj.published) obj.published = new Date(obj.published);
@@ -284,12 +285,35 @@ function child_by_name(parent, name) {
   return null;
 }
 
+// Internal: Find the nodes from the parent node's children that has
+// the given name.
+// 
+// parent - An Array of node objects.
+// name   - String node name.
+// 
+// Returns array of nodes or null.
+function children_by_name(parent, name) {
+  var children = parent.children || [];
+  var re = [];
+  for (var i = 0; i < children.length; i++) {
+    if (children[i].name == name) re.push(children[i]); //return children[i];
+  }
+  return re.length == 0 ? null : re;
+}
+
 // Internal: Get the first child of `parent` with `name`,
 // and return the text of its children.
 function child_data(parent, name) {
-  var node     = child_by_name(parent, name)
+  var node     = children_by_name(parent, name);
   if (!node) return "";
-  var children = node.children;
+  if (node.length > 1) {
+	return node.map(function(n) {
+		var children = n.children;
+		if (!children.length) return "";
+		return children.join("");
+	});
+  }
+  var children = node[0].children;
   if (!children.length) return "";
   return children.join("");
 }
