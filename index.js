@@ -122,7 +122,7 @@ FeedRead.atom = function(xml, source, callback) {
             title:     child_data(art, "title")
           , content:   scrub_html(child_data(art, "content"))
           , published: child_data(art, "published")
-          , enclosure: child_by_name(art, "enclosure").attributes
+          , enclosure: child_by_name(art, "enclosure")
                     || child_data(art, "updated")
           , author:    author || default_author
           , link:      child_by_name(art, "link").attributes.href
@@ -180,7 +180,7 @@ FeedRead.rss = function(xml, source, callback) {
           , content:   scrub_html(child_data(art, "content:encoded"))
                     || scrub_html(child_data(art, "description"))
           , published: child_data(art, "pubDate")
-          , enclosure: child_by_name(art, "enclosure").attributes
+          , enclosure: child_by_name(art, "enclosure")
           , author:    child_data(art, "author")
                     || child_data(art, "dc:creator")
           , link:      child_data(art, "link")
