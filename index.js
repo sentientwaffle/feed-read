@@ -117,12 +117,12 @@ FeedRead.atom = function(xml, source, callback) {
         if (!art.children.length) return false;
         var author = child_by_name(art, "author");
         if (author) author = child_data(author, "name");
-        
+
         var obj = {
             title:     child_data(art, "title")
           , content:   scrub_html(child_data(art, "content"))
           , published: child_data(art, "published")
-          , enclosure: child_data(art, "enclosure")
+          , enclosure: child_by_name(art, "enclosure").attributes
                     || child_data(art, "updated")
           , author:    author || default_author
           , link:      child_by_name(art, "link").attributes.href
@@ -174,12 +174,13 @@ FeedRead.rss = function(xml, source, callback) {
     callback(null, _.filter(_.map(articles,
       function(art) {
         if (!art.children.length) return false;
+
         var obj = {
             title:     child_data(art, "title")
           , content:   scrub_html(child_data(art, "content:encoded"))
                     || scrub_html(child_data(art, "description"))
           , published: child_data(art, "pubDate")
-          , enclosure: child_data(art, "enclosure")
+          , enclosure: child_by_name(art, "enclosure").attributes
           , author:    child_data(art, "author")
                     || child_data(art, "dc:creator")
           , link:      child_data(art, "link")
