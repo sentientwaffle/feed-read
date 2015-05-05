@@ -1,6 +1,7 @@
 var request    = require('request')
   , sax        = require('sax')
-  , _          = require('underscore');
+  , _          = require('underscore')
+  , iconv      = require('iconv-lite');
 
 
 // Public: Fetch the articles from the RSS or ATOM feed.
@@ -51,7 +52,16 @@ FeedRead.identify = function(xml) {
   }
 }
 
-
+// Internal: Identify response charset.
+// 
+// response - Response object (returned by request lib).
+// 
+// Returns charset specified via Content-Type header or "utf-8" if nothing is specified.
+FeedRead.identifyCharset = function(response) {
+  var contentType = response && response.headers && response.headers["content-type"];
+  var match = contentType && contentType.match(/charset=(\S+)/);
+  return match && match[1] || "utf-8";
+}
 
 // Internal: Get a single feed.
 // 
@@ -59,8 +69,9 @@ FeedRead.identify = function(xml) {
 // callback - Receives `(err, articles)`.
 // 
 FeedRead.get = function(feed_url, callback) {
-  request(feed_url, {timeout: 5000}, function(err, res, body) {
+  request(feed_url, {encoding: null, timeout: 5000}, function(err, res, body) {
     if (err) return callback(err);
+    body = iconv.decode(body, FeedRead.identifyCharset(res));
     var type = FeedRead.identify(body);
     if (type == "atom") {
       FeedRead.atom(body, feed_url, callback);
