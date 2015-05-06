@@ -290,9 +290,13 @@ function child_by_name(parent, name) {
 // Internal: Get the first child of `parent` with `name`,
 // and return the text of its children.
 function child_data(parent, name) {
-  var node     = child_by_name(parent, name)
-  if (!node) return "";
-  var children = node.children;
-  if (!children.length) return "";
-  return children.join("");
+	var node     = child_by_name(parent, name);
+	if (!node) return "";
+	var children = node.children;
+	if (!children.length) return "";
+	_.each(children, function(child, index) {
+		if (_.isObject(child))
+			children.splice(index, 1);
+	});
+	return children.join("");
 }
