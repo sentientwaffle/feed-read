@@ -139,7 +139,7 @@ FeedRead.atom = function(xml, source, callback) {
 					, link:      child_by_name(art, "link").attributes.href
 					, feed:      meta
 				};
-				if (obj.published) obj.published = new Date(obj.published);
+				obj.published = obj.published ? new Date(obj.published) : new Date();
 				return obj;
 			}
 		), function(art) { return !!art; }));
@@ -199,7 +199,7 @@ FeedRead.rss = function(xml, source, callback) {
 					, link:      child_data(art, "link")
 					, feed:      meta
 				};
-				if (obj.published) obj.published = new Date(obj.published);
+				obj.published = obj.published ? new Date(obj.published) : new Date();
 				return obj;
 			}
 		), function(art) { return !!art; }));
