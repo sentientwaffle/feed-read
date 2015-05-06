@@ -5,7 +5,8 @@ var request    = require('request')
 
 sanitizeOptions = {
 	allowedTags: [],
-	allowedAttributes: {}
+	allowedAttributes: {},
+	allowedSchemes: []
 };
 
 // Public: Fetch the articles from the RSS or ATOM feed.
@@ -280,6 +281,7 @@ var FeedParser = (function() {
 //
 function scrub_html(html) {
 	html = html.replace(/<script.*<\/script>/gi, "");
+	html = html.replace(/(https?:\/\/[^\s]+)/g, '');
 	return sanitize(html, sanitizeOptions);
 }
 
