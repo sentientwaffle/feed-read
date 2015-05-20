@@ -4,17 +4,17 @@ var request    = require('request')
 
 
 // Public: Fetch the articles from the RSS or ATOM feed.
-// 
+//
 // url      - The String feed url, or an Array of urls.
 // callback - Receives `(err, articles)`, where each article has properties:
-//          
+//
 //              * "title"
 //              * "author"
 //              * "link"
 //              * "content"
 //              * "published"
 //              * "feed" - {name, source, link}
-// 
+//
 // Returns nothing.
 var FeedRead = module.exports = function(feed_url, callback) {
   if (feed_url instanceof Array) {
@@ -37,9 +37,9 @@ var FeedRead = module.exports = function(feed_url, callback) {
 
 
 // Public: Check if the XML is RSS, ATOM, or neither.
-// 
+//
 // xml - A String of XML.
-// 
+//
 // Returns "atom", "rss", or false when it is neither.
 FeedRead.identify = function(xml) {
   if (/<(rss|rdf)\b/i.test(xml)) {
@@ -54,10 +54,10 @@ FeedRead.identify = function(xml) {
 
 
 // Internal: Get a single feed.
-// 
+//
 // feed_url - String url.
 // callback - Receives `(err, articles)`.
-// 
+//
 FeedRead.get = function(feed_url, callback) {
   request(feed_url, {timeout: 5000}, function(err, res, body) {
     if (err) return callback(err);
@@ -75,15 +75,15 @@ FeedRead.get = function(feed_url, callback) {
 
 
 // Public: Parse the articles from some ATOM.
-// 
+//
 // xml      - A XML String.
 // source   - (optional)
 // callback - Receives `(err, articles)`.
-// 
+//
 // Returns an Array of Articles.
 FeedRead.atom = function(xml, source, callback) {
   if (!callback) return FeedRead.atom(xml, "", source);
-  
+
   var parser   = new FeedParser()
     , articles = []
     // Info about the feed itself, not an article.
@@ -92,12 +92,12 @@ FeedRead.atom = function(xml, source, callback) {
     , article
     // The author for when no author is specified for the post.
     , default_author;
-  
-  
+
+
   parser.onopentag = function(tag) {
     if (tag.name == "entry") article = tag;
   };
-  
+
   parser.onclosetag = function(tagname, current_tag) {
     if (tagname == "entry") {
       articles.push(article);
@@ -110,14 +110,14 @@ FeedRead.atom = function(xml, source, callback) {
       meta.name = current_tag.children[0];
     }
   };
-  
+
   parser.onend = function() {
     callback(null, _.filter(_.map(articles,
       function(art) {
         if (!art.children.length) return false;
         var author = child_by_name(art, "author");
         if (author) author = child_data(author, "name");
-        
+
         var obj = {
             title:     child_data(art, "title")
           , content:   scrub_html(child_data(art, "content"))
@@ -132,33 +132,33 @@ FeedRead.atom = function(xml, source, callback) {
       }
     ), function(art) { return !!art; }));
   };
-  
+
   parser.write(xml);
 };
 
 
 // Public: Parse the articles from some RSS.
-// 
+//
 // xml      - A XML String.
 // source   - (optional)
 // callback - Receives `(err, articles)`.
-// 
+//
 // Returns an Array of Articles.
 FeedRead.rss = function(xml, source, callback) {
   if (!callback) return FeedRead.rss(xml, "", source);
-  
+
   var parser   = new FeedParser()
     , articles = []
     // Info about the feed itself, not an article.
     , meta     = {source: source}
     // The current article.
     , article;
-  
-  
+
+
   parser.onopentag = function(tag) {
     if (tag.name == "item") article = tag;
   };
-  
+
   parser.onclosetag = function(tagname, current_tag) {
     if (tagname == "item") {
       articles.push(article);
@@ -168,7 +168,7 @@ FeedRead.rss = function(xml, source, callback) {
       meta.name = child_data(current_tag, "title");
     }
   };
-  
+
   parser.onend = function() {
     callback(null, _.filter(_.map(articles,
       function(art) {
@@ -182,29 +182,30 @@ FeedRead.rss = function(xml, source, callback) {
                     || child_data(art, "dc:creator")
           , link:      child_data(art, "link")
           , feed:      meta
+          , media: child_by_name(art, "media:content")
           };
         if (obj.published) obj.published = new Date(obj.published);
         return obj;
       }
     ), function(art) { return !!art; }));
   };
-  
+
   parser.write(xml);
 };
 
 
 // Methods to override:
-// 
+//
 //   * onopentag
 //   * onclosetag
 //   * onend
-// 
+//
 var FeedParser = (function() {
   // Internal: Parse the XML.
-  // 
+  //
   // xml      - An XML String.
   // callback - Receives `(err, obj)`.
-  // 
+  //
   function FeedParser() {
     this.current_tag = null;
     var parser       = this.parser = sax.parser(true,
@@ -212,22 +213,22 @@ var FeedParser = (function() {
         , normalize: true
         })
       , _this        = this;
-    
+
     parser.onopentag  = function(tag) { _this.open(tag); };
     parser.onclosetag = function(tag) { _this.close(tag); };
-    
+
     parser.onerror = function() { this.error = undefined; }
     parser.ontext  = function(text) { _this.ontext(text); };
     parser.oncdata = function(text) { _this.ontext(text); };
     parser.onend   = function() { _this.onend(); };
   }
-  
-  
+
+
   // Public: Parse the XML.
   FeedParser.prototype.write = function(xml) {
     this.parser.write(xml).close();
   };
-  
+
   // Internal: Open a tag.
   FeedParser.prototype.open = function(tag) {
     tag.parent   = this.current_tag;
@@ -236,7 +237,7 @@ var FeedParser = (function() {
     this.current_tag = tag;
     this.onopentag(tag);
   };
-  
+
   // Internal: CLose a tag.
   FeedParser.prototype.close = function(tagname) {
     this.onclosetag(tagname, this.current_tag);
@@ -246,23 +247,23 @@ var FeedParser = (function() {
       this.current_tag = p;
     }
   };
-  
+
   // Internal: Add the text as a child of the current tag.
   FeedParser.prototype.ontext = function(text) {
     if (this.current_tag) {
       this.current_tag.children.push(text);
     }
   };
-  
+
   return FeedParser;
 })();
 
 
 // Internal: Remove <script> tags from the HTML.
-// 
+//
 // html     - An HTML String.
 // callback - Receives `(err, html)`.
-// 
+//
 // TODO: Do actual HTML parsing!!
 function scrub_html(html) {
   return html.replace(/<script.*<\/script>/gi, "");
@@ -271,10 +272,10 @@ function scrub_html(html) {
 
 // Internal: Find the first node from the parent node's children that has
 // the given name.
-// 
+//
 // parent - An Array of node objects.
 // name   - String node name.
-// 
+//
 // Returns a node Object or null.
 function child_by_name(parent, name) {
   var children = parent.children || [];
