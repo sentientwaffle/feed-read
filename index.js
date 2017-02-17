@@ -61,6 +61,12 @@ FeedRead.identify = function(xml) {
 FeedRead.get = function(feed_url, callback) {
   request(feed_url, {timeout: 5000}, function(err, res, body) {
     if (err) return callback(err);
+    
+    //fix Non-whitespace before first tag
+    if(body){
+      body = body.replace("\ufeff", "");
+    }
+    
     var type = FeedRead.identify(body);
     if (type == "atom") {
       FeedRead.atom(body, feed_url, callback);
