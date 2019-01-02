@@ -11,7 +11,7 @@ a common article object.
 
 # Usage
 
-    var feed = require("feed-read");
+    const feed = require("feed-read")
 
 ## `feed(url, callback)`
 Fetch a feed.
@@ -19,14 +19,14 @@ Fetch a feed.
     feed("http://craphound.com/?feed=rss2", function(err, articles) {
       if (err) throw err;
       // Each article has the following properties:
-      // 
+      //
       //   * "title"     - The article title (String).
       //   * "author"    - The author's name (String).
       //   * "link"      - The original article link (String).
       //   * "content"   - The HTML content of the article (String).
       //   * "published" - The date that the article was published (Date).
       //   * "feed"      - {name, source, link}
-      // 
+      //
     });
 
 ## `feed.rss(rss_string, callback)`
@@ -47,4 +47,3 @@ Returns `false` when it is neither RSS or ATOM.
 
 # License
 See LICENSE.
-

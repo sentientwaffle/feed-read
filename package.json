@@ -1,38 +1,41 @@
-{ "name":        "feed-read"
-, "version":     "0.0.1"
-, "description": "a ATOM and RSS feed parser"
-, "keywords":    ["atom", "rss", "feed", "parser"]
-, "homepage":    "https://github.com/sentientwaffle/feed-read"
-, "bugs":
-  { "url":  "https://github.com/sentientwaffle/feed-read/issues"
+{
+  "name": "feed-read",
+  "version": "0.0.2",
+  "description": "a ATOM and RSS feed parser",
+  "keywords": [
+    "atom",
+    "rss",
+    "feed",
+    "parser"
+  ],
+  "homepage": "https://github.com/sentientwaffle/feed-read",
+  "bugs": {
+    "url": "https://github.com/sentientwaffle/feed-read/issues"
+  },
+  "author": {
+    "name": "sentientwaffle",
+    "url": "https://sentientwaffle.github.io/"
+  },
+  "main": "./index",
+  "scripts": {
+    "test": "mocha --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sentientwaffle/feed-read.git"
+  },
+  "dependencies": {
+    "request": "^2.88.0",
+    "sax": "^1.2.4",
+    "serve-static": "^1.13.2",
+    "underscore": "^1.9.1"
+  },
+  "devDependencies": {
+    "connect": "^3.6.6",
+    "mocha": "^5.2.0",
+    "should": "^13.2.3"
+  },
+  "engines": {
+    "node": ">=8.x"
   }
-, "author":
-  { "name": "sentientwaffle"
-  , "url":  "http://sentientwaffle.github.com/"
-  }
-
-, "main": "./index"
-, "scripts":
-  { "test": "mocha"
-  }
-
-
-, "repository":
-  { "type": "git"
-  , "url":  "https://github.com/sentientwaffle/feed-read.git"
-  }
-
-, "dependencies":
-  { "request":    "2.x.x"
-  , "sax":        "0.3.x"
-  , "underscore": "1.x.x"
-  }
-
-, "devDependencies":
-  { "should":  "0.x.x"
-  , "mocha":   "0.x.x"
-  , "connect": "1.x.x"
-  }
-
-, "engines": { "node": ">=0.4.1" }
 }
