@@ -1,13 +1,14 @@
 var feed    = require('../')
   , should  = require('should')
   , connect = require('connect')
+  , static = require('serve-static')
   , _       = require('underscore')
   , fs      = require('fs');
 
 
 // Serve the fixtures.
 connect()
-  .use(connect.static(__dirname + "/fixtures"))
+  .use(static(__dirname + "/fixtures"))
   .listen(4478);
 
 var host = "http://127.0.0.1:4478";
@@ -44,16 +45,16 @@ describe("feed", function() {
       });
       
       it("is an Array", function() {
-        articles.should.be.an.instanceof(Array);
+        should(articles).be.an.instanceof(Array);
       });
       
       it("contains articles", function() {
-        articles[0].title.should.eql("Save file on blur");
+        should(articles[0].title).eql("Save file on blur");
       });
       
       it("attaches the feed to each article", function() {
-        articles[0].feed.source.should.eql(host + "/atom.xml");
-        articles[0].feed.name.should.eql("DJG");
+        should(articles[0].feed.source).eql(host + "/atom.xml");
+        should(articles[0].feed.name).eql("DJG");
       });
     });
     
@@ -68,8 +69,8 @@ describe("feed", function() {
       });
       
       it("is an Array of articles", function() {
-        articles.should.be.an.instanceof(Array);
-        articles[0].title.should.be.a("string");
+        should(articles).be.an.instanceof(Array);
+        should(articles[0].title).be.a.String();
       });
     });
   });
@@ -77,7 +78,7 @@ describe("feed", function() {
   it("handles RDF as RSS", function(done) {
     feed("http://rss.slashdot.org/Slashdot/slashdot", function(err, articles) {
       should.not.exist(err);
-      articles.should.be.an.instanceof(Array);
+      should(articles).be.an.instanceof(Array);
       done();
     });
   });
@@ -85,10 +86,10 @@ describe("feed", function() {
   it("can fetch multiple urls", function(done) {
     feed([host + "/atom.xml", host + "/rss.xml"], function(err, articles) {
       if (err) return done(err);
-      articles.should.be.an.instanceof(Array);
+      should(articles).be.an.instanceof(Array);
       _.each(articles, function(art) {
-        art.title.should.be.a("string");
-        art.feed.source.should.include(host);
+        should(art.title).be.a.String();
+        should(art.feed.source).containEql(host);
       });
       done();
     });
@@ -97,15 +98,15 @@ describe("feed", function() {
   
   describe(".identify", function() {
     it("identifies ATOM", function() {
-      feed.identify(fixtures.atom).should.eql("atom");
+      should(feed.identify(fixtures.atom)).eql("atom");
     });
     
     it("identifies RSS", function() {
-      feed.identify(fixtures.rss).should.eql("rss");
+      should(feed.identify(fixtures.rss)).eql("rss");
     });
     
     it("is false when neither", function() {
-      feed.identify("hi there").should.be_false;
+      should(feed.identify("hi there")).be_false;
     });
   });
   
@@ -121,33 +122,33 @@ describe("feed", function() {
       });
       
       it("is an Array of articles", function() {
-        articles.should.be.an.instanceof(Array);
-        articles[0].should.be.an.instanceof(Object);
+        should(articles).be.an.instanceof(Array);
+        should(articles[0]).be.an.instanceof(Object);
       });
       
       it("has a title", function() {
-        articles[0].title.should.eql("Save file on blur");
+        should(articles[0].title).eql("Save file on blur");
       });
       
       it("has an author", function() {
-        articles[0].author.should.eql("DJG");
+        should(articles[0].author).eql("DJG");
       });
       
       it("has a link", function() {
-        articles[0].link.should.eql("http://sentientwaffle.github.com/save-file-on-blur");
+        should(articles[0].link).eql("http://sentientwaffle.github.com/save-file-on-blur");
       });
       
       it("has content", function() {
-        articles[0].content.should.include("Installing the plugin");
+        should(articles[0].content).containEql("Installing the plugin");
       });
       
       it("has a published date", function() {
-        articles[0].published.should.be.an.instanceof(Date);
+        should(articles[0].published).be.an.instanceof(Date);
       });
       
       it("has a feed", function() {
-        articles[0].feed.name.should.eql("DJG");
-        articles[0].feed.link.should.eql("http://sentientwaffle.github.com/");
+        should(articles[0].feed.name).eql("DJG");
+        should(articles[0].feed.link).eql("http://sentientwaffle.github.com/");
       });
     });
     
@@ -155,7 +156,7 @@ describe("feed", function() {
       it("doesn't crash on invalid XML", function(done) {
         feed.atom(fixtures.atom_invalid, function(err, arts) {
           should.not.exist(err);
-          arts.should.be.an.instanceof(Array);
+          should(arts).be.an.instanceof(Array);
           done();
         });
       });
@@ -174,34 +175,34 @@ describe("feed", function() {
       });
       
       it("is an Array of articles", function() {
-        articles.should.be.an.instanceof(Array);
-        articles[0].should.be.an.instanceof(Object);
+        should(articles).be.an.instanceof(Array);
+        should(articles[0]).be.an.instanceof(Object);
       });
       
       it("has a title", function() {
-        articles[0].title.should.eql("What’s Inside the Box?");
+        should(articles[0].title).eql("What’s Inside the Box?");
       });
       
       it("has an author", function() {
-        articles[0].author.should.eql("Cory Doctorow");
+        should(articles[0].author).eql("Cory Doctorow");
       });
       
       it("has a link", function() {
-        articles[0].link.should.eql("http://craphound.com/?p=3911");
+        should(articles[0].link).eql("http://craphound.com/?p=3911");
       });
       
       it("has content", function() {
-        articles[0].content.should.include("Here's a podcast of my last");
-        articles[0].content.should.include("John Taylor Williams is a full-time");
+        should(articles[0].content).containEql("Here's a podcast of my last");
+        should(articles[0].content).containEql("John Taylor Williams is a full-time");
       });
       
       it("has a published date", function() {
-        articles[0].published.should.be.an.instanceof(Date);
+        should(articles[0].published).be.an.instanceof(Date);
       });
       
       it("has a feed", function() {
-        articles[0].feed.name.should.eql("Cory Doctorow's craphound.com");
-        articles[0].feed.link.should.eql("http://craphound.com");
+        should(articles[0].feed.name).eql("Cory Doctorow's craphound.com");
+        should(articles[0].feed.link).eql("http://craphound.com");
       });
     });
     
@@ -215,14 +216,14 @@ describe("feed", function() {
       });
       
       it("has a title", function() {
-        articles[0].title.should.eql("Goldman's Blankfein hit hard on CDO conflicts - MarketWatch");
+        should(articles[0].title).eql("Goldman's Blankfein hit hard on CDO conflicts - MarketWatch");
       });
       
       it("has a published date", function() {
         var date = articles[0].published;
-        date.getDate().should.eql(27);
-        date.getMonth().should.eql(3);
-        date.getFullYear().should.eql(2010);
+        should(date.getDate()).eql(27);
+        should(date.getMonth()).eql(3);
+        should(date.getFullYear()).eql(2010);
       });
     });
     
@@ -236,12 +237,12 @@ describe("feed", function() {
       });
       
       it("has a title", function() {
-        articles[0].title.should.eql("Sexy IPOs Versus SaaS-y IPOs");
+        should(articles[0].title).eql("Sexy IPOs Versus SaaS-y IPOs");
       });
       
       it("filters out all <script> tags", function() {
         articles.forEach(function(article) {
-          article.content.should.not.match(/<script/i);
+          should(article.content).not.match(/<script/i);
         });
       });
       
@@ -250,16 +251,16 @@ describe("feed", function() {
         articles.forEach(function(article) {
           if (~article.content.indexOf('<li>')) li = true;
         });
-        li.should.be.true;
+        should(li).be.true;
       });
       
       it("has an author", function() {
-        articles[0].author.should.eql("Contributor");
+        should(articles[0].author).eql("Contributor");
       });
       
       it("attaches the feed metadata to each article", function() {
-        articles[0].feed.name.should.eql("TechCrunch");
-        articles[0].feed.link.should.eql("http://techcrunch.com");
+        should(articles[0].feed.name).eql("TechCrunch");
+        should(articles[0].feed.link).eql("http://techcrunch.com");
       });
     });
   });
